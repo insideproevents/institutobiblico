@@ -1,5 +1,6 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home1/jaimeign/repositories/institutobiblico
-    - /bin/cp -R images $DEPLOYPATH
+    - export DEPLOYPATH=/home1/jaimeign/public_html/institutobiblico
+    - /usr/bin/rsync -av --delete --exclude='.git' ./ $DEPLOYPATH
+    - /bin/chmod -R 755 $DEPLOYPATH
