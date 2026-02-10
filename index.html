@@ -32,36 +32,52 @@
           return document.body;
         }
 
-        function insertBelowButtons(imgSrc, altText){
+        function smallestContainerContainingBoth(ancestor, a, b){
+          // among direct children of ancestor, find the smallest child that contains both nodes
+          var children = Array.from(ancestor.children);
+          for(var i=0;i<children.length;i++){
+            var child = children[i];
+            if(child.contains(a) && child.contains(b)){
+              // recurse into this child to find even smaller container
+              return smallestContainerContainingBoth(child, a, b) || child;
+            }
+          }
+          return null;
+        }
+
+        function insertImmediateAfterButtons(imgSrc, altText){
           var nodes = Array.from(document.querySelectorAll('button, a, [role="button"]'));
           var insBtn = nodes.find(function(n){ return normalizeText(n.textContent).includes('inscrib'); });
           var verBtn = nodes.find(function(n){ return normalizeText(n.textContent).includes('ver cursos'); });
 
-          // if both buttons found, insert once below their common ancestor
+          if(!insBtn && !verBtn) return false;
+
           if(insBtn && verBtn){
             var ancestor = getCommonAncestor(insBtn, verBtn) || document.body;
-            if(ancestor.dataset.heroImgInserted) return true;
+            var container = smallestContainerContainingBoth(ancestor, insBtn, verBtn) || ancestor;
+            // insert immediately after that container
+            if(container.dataset.heroImgInserted) return true;
             var img = document.createElement('img'); img.src = imgSrc; img.alt = altText || ''; img.className = 'hero-inline-image';
-            ancestor.insertAdjacentElement('afterend', img);
-            ancestor.dataset.heroImgInserted = '1';
+            container.insertAdjacentElement('afterend', img);
+            container.dataset.heroImgInserted = '1';
             return true;
           }
 
-          // fallback: if only one exists, insert after its container
+          // if only one button found, insert right after its closest container
           var single = verBtn || insBtn;
-          if(single && !single.dataset.heroImgInserted){
-            var container = single.closest('section') || single.parentElement || single;
-            var img = document.createElement('img'); img.src = imgSrc; img.alt = altText || ''; img.className = 'hero-inline-image';
-            container.insertAdjacentElement('afterend', img);
-            single.dataset.heroImgInserted = '1';
+          var cont = single.closest('section') || single.parentElement || single;
+          if(cont && !cont.dataset.heroImgInserted){
+            var img2 = document.createElement('img'); img2.src = imgSrc; img2.alt = altText || ''; img2.className = 'hero-inline-image';
+            cont.insertAdjacentElement('afterend', img2);
+            cont.dataset.heroImgInserted = '1';
             return true;
           }
           return false;
         }
 
-        var observer = new MutationObserver(function(){ if(insertBelowButtons('./assets/ver_cursos.jpg','Ver Cursos')) observer.disconnect(); });
+        var observer = new MutationObserver(function(){ if(insertImmediateAfterButtons('./assets/ver_cursos.jpg','Ver Cursos')) observer.disconnect(); });
         observer.observe(document.body, { childList: true, subtree: true });
-        window.addEventListener('load', function(){ setTimeout(function(){ insertBelowButtons('./assets/ver_cursos.jpg','Ver Cursos'); }, 600); });
+        window.addEventListener('load', function(){ setTimeout(function(){ insertImmediateAfterButtons('./assets/ver_cursos.jpg','Ver Cursos'); }, 400); });
       })();
     </script>
   </head>
