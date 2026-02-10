@@ -7,6 +7,44 @@
     <script type="module" crossorigin src="./assets/index-vqov2rju.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-Cz28VGNv.css">
     <link rel="stylesheet" crossorigin href="./assets/override.css">
+    <!-- Script to insert hero image under the "Ver Cursos" button if present -->
+    <script>
+      (function(){
+        function insertHeroImage(imgSrc, altText){
+          var observer = new MutationObserver(function(mutations, obs){
+            var buttons = Array.from(document.querySelectorAll('button'));
+            var target = buttons.find(function(b){
+              return b.textContent && b.textContent.trim().toLowerCase() === 'ver cursos';
+            });
+            if(target){
+              // avoid inserting multiple times
+              if(target.dataset.heroImgInserted) { obs.disconnect(); return; }
+              var img = document.createElement('img');
+              img.src = imgSrc;
+              img.alt = altText || '';
+              img.className = 'hero-inline-image';
+              // Insert after the button's container if possible
+              var parent = target.parentElement || target;
+              parent.insertAdjacentElement('afterend', img);
+              target.dataset.heroImgInserted = '1';
+              obs.disconnect();
+            }
+          });
+          observer.observe(document.body, { childList: true, subtree: true });
+          // fallback: try after load
+          window.addEventListener('load', function(){ setTimeout(function(){
+            var buttons = Array.from(document.querySelectorAll('button'));
+            var target = buttons.find(function(b){ return b.textContent && b.textContent.trim().toLowerCase() === 'ver cursos'; });
+            if(target && !target.dataset.heroImgInserted){
+              var img = document.createElement('img'); img.src = imgSrc; img.alt = altText || ''; img.className = 'hero-inline-image';
+              var parent = target.parentElement || target; parent.insertAdjacentElement('afterend', img); target.dataset.heroImgInserted = '1';
+            }
+          }, 400); });
+        }
+        // use the placeholder by default; replace this path with your real image: ./assets/your-image.jpg
+        insertHeroImage('./assets/hero-placeholder.svg', 'Estudiantes leyendo');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

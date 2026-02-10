@@ -64,3 +64,19 @@ p, h1, h2, h3, h4, h5, h6, li, a, span {
     min-width: 0;
   }
 }
+
+/* Styles for the hero inline image inserted under "Ver Cursos" */
+.hero-inline-image {
+  display: block;
+  width: 100%;
+  max-width: calc(100% - 2rem);
+  margin: 1.25rem auto 0;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(16,24,40,0.12);
+}
+
+/* Smaller footprint on very small screens */
+@media (max-width: 420px) {
+  .hero-inline-image { margin-top: 0.75rem; border-radius: 8px; }
+}
