@@ -25,3 +25,42 @@
     border-color: #c9a227 !important;
   }
 }
+
+/* Prevent horizontal overflow on small screens */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden; /* prevent accidental horizontal scrolling */
+}
+
+/* Ensure media and SVGs scale down */
+img, svg, video, iframe, canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Make sure common max-width utility containers don't overflow on very small devices */
+.max-w-7xl, .max-w-4xl, .max-w-3xl, .max-w-2xl, .max-w-xl, .max-w-lg, .max-w-max, .container {
+  max-width: 100% !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  box-sizing: border-box !important;
+}
+
+/* Wrap long words/URLs so they don't cause overflow */
+p, h1, h2, h3, h4, h5, h6, li, a, span {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Force any extremely wide elements to fit within viewport */
+* {
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  /* small extra safeguard for transforms or large fixed elements */
+  body > * {
+    min-width: 0;
+  }
+}
