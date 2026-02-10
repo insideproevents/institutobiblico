@@ -76,6 +76,12 @@ p, h1, h2, h3, h4, h5, h6, li, a, span {
   box-shadow: 0 10px 30px rgba(16,24,40,0.12);
 }
 
+/* Place the hero image on the top layer */
+.hero-inline-image {
+  position: relative;
+  z-index: 9999;
+}
+
 /* Smaller footprint on very small screens */
 @media (max-width: 420px) {
   .hero-inline-image { margin-top: 0.75rem; border-radius: 8px; }
