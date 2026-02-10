@@ -5,7 +5,7 @@
    - Hover/Focus: gold background with white text for strong contrast */
 #inicio .border-2.border-white\/30.text-white{
   border-color: #c9a227 !important; /* gold border */
-  color: #0f1f35 !important; /* dark navy text in normal state */
+  color: #ffffff !important; /* white text in normal state */
   background-color: transparent !important;
 }
 #inicio .border-2.border-white\/30.text-white:hover,
