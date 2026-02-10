@@ -10,47 +10,58 @@
     <!-- Script to insert hero image under the "Ver Cursos" button if present -->
     <script>
       (function(){
-        function tryInsert(imgSrc, altText){
+        function normalizeText(s){
+          if(!s) return '';
           try{
-            var section = document.querySelector('#inicio');
-            var target = null;
-            if(section){
-              // find button inside section matching text
-              var buttons = Array.from(section.querySelectorAll('button, a, [role="button"]'));
-              target = buttons.find(function(b){
-                return b.textContent && b.textContent.trim().toLowerCase().includes('ver cursos');
-              });
-            }
-            // fallback: search anywhere
-            if(!target){
-              var buttonsAll = Array.from(document.querySelectorAll('button, a, [role="button"]'));
-              target = buttonsAll.find(function(b){ return b.textContent && b.textContent.trim().toLowerCase().includes('ver cursos'); });
-            }
-
-            if(target){
-              if(target.dataset.heroImgInserted) return true;
-              var img = document.createElement('img');
-              img.src = imgSrc;
-              img.alt = altText || '';
-              img.className = 'hero-inline-image';
-              // Prefer inserting after the closest block container (section or div)
-              var container = target.closest('section') || target.parentElement || target;
-              container.insertAdjacentElement('afterend', img);
-              target.dataset.heroImgInserted = '1';
-              return true;
-            }
-            return false;
+            return s.normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase();
           }catch(e){
-            return false;
+            return s.toLowerCase();
           }
         }
 
-        // Observe changes and try to insert when the Hero renders
-        var obs = new MutationObserver(function(){ if(tryInsert('./assets/ver_cursos.webp','Ver Cursos')) obs.disconnect(); });
-        obs.observe(document.body, { childList:true, subtree:true });
+        function getCommonAncestor(a,b){
+          var pa = a;
+          while(pa){
+            var pb = b;
+            while(pb){
+              if(pa === pb) return pa;
+              pb = pb.parentElement;
+            }
+            pa = pa.parentElement;
+          }
+          return document.body;
+        }
 
-        // final fallback after load
-        window.addEventListener('load', function(){ setTimeout(function(){ tryInsert('./assets/ver_cursos.webp','Ver Cursos'); }, 500); });
+        function insertBelowButtons(imgSrc, altText){
+          var nodes = Array.from(document.querySelectorAll('button, a, [role="button"]'));
+          var insBtn = nodes.find(function(n){ return normalizeText(n.textContent).includes('inscrib'); });
+          var verBtn = nodes.find(function(n){ return normalizeText(n.textContent).includes('ver cursos'); });
+
+          // if both buttons found, insert once below their common ancestor
+          if(insBtn && verBtn){
+            var ancestor = getCommonAncestor(insBtn, verBtn) || document.body;
+            if(ancestor.dataset.heroImgInserted) return true;
+            var img = document.createElement('img'); img.src = imgSrc; img.alt = altText || ''; img.className = 'hero-inline-image';
+            ancestor.insertAdjacentElement('afterend', img);
+            ancestor.dataset.heroImgInserted = '1';
+            return true;
+          }
+
+          // fallback: if only one exists, insert after its container
+          var single = verBtn || insBtn;
+          if(single && !single.dataset.heroImgInserted){
+            var container = single.closest('section') || single.parentElement || single;
+            var img = document.createElement('img'); img.src = imgSrc; img.alt = altText || ''; img.className = 'hero-inline-image';
+            container.insertAdjacentElement('afterend', img);
+            single.dataset.heroImgInserted = '1';
+            return true;
+          }
+          return false;
+        }
+
+        var observer = new MutationObserver(function(){ if(insertBelowButtons('./assets/ver_cursos.jpg','Ver Cursos')) observer.disconnect(); });
+        observer.observe(document.body, { childList: true, subtree: true });
+        window.addEventListener('load', function(){ setTimeout(function(){ insertBelowButtons('./assets/ver_cursos.jpg','Ver Cursos'); }, 600); });
       })();
     </script>
   </head>
