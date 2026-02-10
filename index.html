@@ -10,39 +10,47 @@
     <!-- Script to insert hero image under the "Ver Cursos" button if present -->
     <script>
       (function(){
-        function insertHeroImage(imgSrc, altText){
-          var observer = new MutationObserver(function(mutations, obs){
-            var buttons = Array.from(document.querySelectorAll('button'));
-            var target = buttons.find(function(b){
-              return b.textContent && b.textContent.trim().toLowerCase() === 'ver cursos';
-            });
+        function tryInsert(imgSrc, altText){
+          try{
+            var section = document.querySelector('#inicio');
+            var target = null;
+            if(section){
+              // find button inside section matching text
+              var buttons = Array.from(section.querySelectorAll('button, a, [role="button"]'));
+              target = buttons.find(function(b){
+                return b.textContent && b.textContent.trim().toLowerCase().includes('ver cursos');
+              });
+            }
+            // fallback: search anywhere
+            if(!target){
+              var buttonsAll = Array.from(document.querySelectorAll('button, a, [role="button"]'));
+              target = buttonsAll.find(function(b){ return b.textContent && b.textContent.trim().toLowerCase().includes('ver cursos'); });
+            }
+
             if(target){
-              // avoid inserting multiple times
-              if(target.dataset.heroImgInserted) { obs.disconnect(); return; }
+              if(target.dataset.heroImgInserted) return true;
               var img = document.createElement('img');
               img.src = imgSrc;
               img.alt = altText || '';
               img.className = 'hero-inline-image';
-              // Insert after the button's container if possible
-              var parent = target.parentElement || target;
-              parent.insertAdjacentElement('afterend', img);
+              // Prefer inserting after the closest block container (section or div)
+              var container = target.closest('section') || target.parentElement || target;
+              container.insertAdjacentElement('afterend', img);
               target.dataset.heroImgInserted = '1';
-              obs.disconnect();
+              return true;
             }
-          });
-          observer.observe(document.body, { childList: true, subtree: true });
-          // fallback: try after load
-          window.addEventListener('load', function(){ setTimeout(function(){
-            var buttons = Array.from(document.querySelectorAll('button'));
-            var target = buttons.find(function(b){ return b.textContent && b.textContent.trim().toLowerCase() === 'ver cursos'; });
-            if(target && !target.dataset.heroImgInserted){
-              var img = document.createElement('img'); img.src = imgSrc; img.alt = altText || ''; img.className = 'hero-inline-image';
-              var parent = target.parentElement || target; parent.insertAdjacentElement('afterend', img); target.dataset.heroImgInserted = '1';
-            }
-          }, 400); });
+            return false;
+          }catch(e){
+            return false;
+          }
         }
-        // use the repository image `assets/ver_cursos.*` inserted under the button
-        insertHeroImage('./assets/ver_cursos.webp', 'Ver Cursos');
+
+        // Observe changes and try to insert when the Hero renders
+        var obs = new MutationObserver(function(){ if(tryInsert('./assets/ver_cursos.webp','Ver Cursos')) obs.disconnect(); });
+        obs.observe(document.body, { childList:true, subtree:true });
+
+        // final fallback after load
+        window.addEventListener('load', function(){ setTimeout(function(){ tryInsert('./assets/ver_cursos.webp','Ver Cursos'); }, 500); });
       })();
     </script>
   </head>
