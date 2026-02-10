@@ -1,25 +1,27 @@
 /* override.css - accessibility improvements for specific buttons */
 
-/* Improve contrast for the "Ver Cursos" outlined button in the Hero (#inicio) */
+/* Improve contrast for the "Ver Cursos" outlined button in the Hero (#inicio)
+   - Normal: dark text + gold border for legibility on light/dark backgrounds
+   - Hover/Focus: gold background with white text for strong contrast */
 #inicio .border-2.border-white\/30.text-white{
-  border-color: rgba(255,255,255,0.85) !important;
-  color: #ffffff !important;
+  border-color: #c9a227 !important; /* gold border */
+  color: #0f1f35 !important; /* dark navy text in normal state */
+  background-color: transparent !important;
 }
 #inicio .border-2.border-white\/30.text-white:hover,
 #inicio .border-2.border-white\/30.text-white:focus{
-  background-color: rgba(255,255,255,0.18) !important;
-  color: #0f1f35 !important; /* dark text on light hover bg for better contrast */
-  border-color: rgba(255,255,255,0.85) !important;
+  background-color: #c9a227 !important; /* gold */
+  color: #ffffff !important; /* white text on gold */
+  border-color: #c9a227 !important;
   box-shadow: 0 6px 18px rgba(0,0,0,0.18);
   outline: none;
 }
 #inicio .border-2.border-white\/30.text-white:focus-visible{
-  box-shadow: 0 0 0 4px rgba(201,162,39,0.16);
+  box-shadow: 0 0 0 4px rgba(201,162,39,0.18);
 }
 
-/* Ensure the change applies to high-contrast preferences */
 @media (prefers-contrast: more){
   #inicio .border-2.border-white\/30.text-white{
-    border-color: rgba(255,255,255,0.95) !important;
+    border-color: #c9a227 !important;
   }
 }
